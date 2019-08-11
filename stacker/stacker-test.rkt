@@ -1,4 +1,4 @@
 #lang reader "stacker.rkt"
-foo
-bar
-zam
+42
+"Hello world"
+#t
