@@ -33,7 +33,40 @@
   ;; #' converts the following code into a syntax object while also capturing
   ;; the lexical context (all variables in scope)
   #'(#%module-begin
-     HANDLE-EXPR ...))
+     HANDLE-EXPR ...
+     (display (first stack))))
 
 ;; We rename stacker-module-begin to #%module-begin so Racket knows to call it.
 (provide (rename-out [stacker-module-begin #%module-begin]))
+
+;; Define a stack to store numbers.
+(define stack empty)
+
+;; Removes the top element from the stack, setting the stack to contain only
+;; values after the first.
+;; By convention, Racket functions which mutate a variable and with an !
+(define (pop-stack!)
+  (define arg (first stack))
+  (set! stack (rest stack))
+  arg)
+
+(define (push-stack! arg)
+  ;; cons is one of the oldest Lisp functions, which constructs a new item in
+  ;; memory. What we're doing here is prepending arg to stack to form a new
+  ;; stack, which we set the original stack variable to.
+  (set! stack (cons arg stack)))
+
+
+;; [arg #f] declares arg as an optional argument.
+(define (handle [arg #f])
+  (cond
+   ;; If the value is a number, push it to the stack.
+   [(number? arg) (push-stack! arg)]
+   ;; If the value is an operator, perform the operation against two numbers
+   ;; popped from the stack.
+   [(or (equal? + arg) (equal? * arg))
+    (define op-result (arg (pop-stack!) (pop-stack!)))
+    (push-stack! op-result)]))
+(provide handle)
+
+(provide * +)
