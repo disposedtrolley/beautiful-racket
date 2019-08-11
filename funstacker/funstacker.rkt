@@ -3,17 +3,17 @@
 (define (read-syntax path port)
   (define src-lines (port->lines port))
   (define src-datums (format-datums '(handle ~a) src-lines))
-  (define module-datum `(module stacker-mod "funstacker.rkt"
+  (define module-datum `(module funstacker-mod "funstacker.rkt"
                           ,@src-datums))
   (datum->syntax #f module-datum))
 
 (provide read-syntax)
 
-(define-macro (stacker-module-begin HANDLE-EXPR ...)
+(define-macro (funstacker-module-begin HANDLE-EXPR ...)
   #'(#%module-begin
      HANDLE-EXPR ...
      (display (first stack))))
-(provide (rename-out [stacker-module-begin #%module-begin]))
+(provide (rename-out [funstacker-module-begin #%module-begin]))
 
 (define stack empty)
 (define (pop-stack!)
