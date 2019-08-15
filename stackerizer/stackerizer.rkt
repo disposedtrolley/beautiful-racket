@@ -6,11 +6,14 @@
      (for-each displayln (reverse (flatten EXPR)))))
 (provide (rename-out [stackerizer-mb #%module-begin]))
 
-;; Matches syntax patterns for single value and ulti-value operations.
-(define-macro-cases +
-  [(+ FIRST) #'FIRST]
-  ;; Matches a variadic addition operation.
-  ;; Recursively transforms the operation into a dyadic one by repeatedly nesting operations.
-  ;; NB: '+ is the literal plus sign, while + refers to the ID of this macro.
-  [(+ FIRST NEXT ...) #'(list '+ FIRST (+ NEXT ...))])
+(define-macro (define-op OP)
+  #'(define-macro-cases OP
+      [(OP FIRST) #'FIRST]
+      ;; We want the ellipsis to be in the resulting op macro, not the
+      ;; define-op macro. To do this we escape them using the (... ...)
+      ;; syntax.
+      [(OP FIRST NEXT (... ...))
+       #'(list 'OP FIRST (OP NEXT (... ...)))]))
 
+(define-op +)
+(define-op *)
