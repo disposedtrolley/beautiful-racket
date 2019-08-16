@@ -15,5 +15,15 @@
       [(OP FIRST NEXT (... ...))
        #'(list 'OP FIRST (OP NEXT (... ...)))]))
 
-(define-op +)
-(define-op *)
+;; A macro which defines an individual macro for each operator supplied.
+(define-macro (define-ops OP ...)
+  #'(begin
+      (define-macro-cases OP
+        [(OP FIRST) #'FIRST]
+        [(OP FIRST NEXT (... ...))
+         #'(list 'OP FIRST (OP NEXT (... ...)))])
+      ...))
+
+;;(define-op +)
+;;(define-op *)
+(define-ops + *)
